@@ -1,14 +1,13 @@
 use std::path::{Path, PathBuf};
 
 use convert_case::{Case, Casing};
-use parse_display::{Display, FromStr};
 use structopt::StructOpt;
 
 #[derive(StructOpt, Debug)]
 enum Opt {
     #[structopt(name = "build")]
     Build {
-        /// ~/homebrew-tap
+        /// ~/homebrew-tap repository path
         #[structopt(long)]
         tap: PathBuf,
     },
