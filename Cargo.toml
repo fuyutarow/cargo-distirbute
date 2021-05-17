@@ -1,0 +1,16 @@
+[package]
+name = "cargo-distribute"
+version = "0.202105.0"
+authors = ["fuyutarow"]
+edition = "2018"
+description = "A CLI tool"
+homepage = "https://github.com/fuyutarow/cargo-distribute"
+repository = "https://github.com/fuyutarow/cargo-distribute.git"
+
+[dependencies]
+cargo_toml = "0.9.1"
+convert_case = "0.4.0"
+parse-display = "0.4.1"
+structopt = "0.3.21"
+tera = "1.9.0"
+toml = "0.5.8"
