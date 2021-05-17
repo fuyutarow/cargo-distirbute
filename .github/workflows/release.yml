@@ -33,6 +33,8 @@ jobs:
         id: build_linux
         run: |
           BIN_ZIP=./${BIN_NAME}-${VERSION}-x86_64-linux.zip
+          rustup target add x86_64-unknown-linux-musl
+          sudo apt-get -qq install musl-tools
           cargo build --locked --release --target=x86_64-unknown-linux-musl
           zip -j ${BIN_ZIP} target/x86_64-unknown-linux-musl/release/${BIN_NAME}
           echo "::set-output name=sha::$(shasum -a 256 ${BIN_ZIP} |awk '{print $1}')"
