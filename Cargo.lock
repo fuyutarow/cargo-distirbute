@@ -85,7 +85,7 @@ checksum = "14c189c53d098945499cdfa7ecc63567cf3886b3332b312a5b4585d8d3a6a610"
 
 [[package]]
 name = "cargo-distribute"
-version = "0.202105.1"
+version = "0.202105.2"
 dependencies = [
  "cargo_toml",
  "convert_case",
