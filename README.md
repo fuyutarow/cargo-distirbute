@@ -17,7 +17,7 @@ In order to distribute packages using homebrew, two repositories are required.
     - This is the tap repository you need to distribute using homebrew
 
 
-Step 1. Create a `usename/homebrew-tap` repository
+### Step 1. Create a `usename/homebrew-tap` repository
 ```
 ~$ mkdir ~/homebrew-tap
 ~$ cd $_
@@ -25,13 +25,14 @@ Step 1. Create a `usename/homebrew-tap` repository
 ~/homebrew-tap$ git push
 ```
 
-Step 2. Generate a github toke from this link. https://github.com/settings/tokens
+### Step 2. Generate a github toke from this link. https://github.com/settings/tokens
+![](https://raw.githubusercontent.com/fuyutarow/cargo-distribute/alpha/assets/step2.png)
 
 
-Step 3.  Register the value of the token created in Step 2 in the actions sercrets of this link. https://github.com/usename/myproject/settings/secrets/actions
+### Step 3.  Register the value of the token created in Step 2 in the actions sercrets of this link. https://github.com/usename/myproject/settings/secrets/actions
+![](https://raw.githubusercontent.com/fuyutarow/cargo-distribute/alpha/assets/step3.png)
 
-
-Step 4. Use cargo-ditribute to generate the necessary files
+### Step 4. Use cargo-ditribute to generate the necessary files
 
 Two files will be generated.
     - `myproject/.github/workflows/release.yml`
@@ -49,7 +50,7 @@ Do a git commit and push in each of the two repositories.  `username/myproject` 
 ~/homebrew-tap$ git push
 ```
 
-Step 5. Add a tag for `username/myproject` and push it
+### Step 5. Add a tag for `username/myproject` and push it
 
 This will trigger the distribution.
 ```
