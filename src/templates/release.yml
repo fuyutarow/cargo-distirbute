@@ -9,8 +9,7 @@ jobs:
   build:
     strategy:
       matrix:
-        # os: [ubuntu-latest, macOS-latest, windows-latest]
-        os: [macOS-latest]
+        os: [ubuntu-latest, macOS-latest]
         rust: [stable]
 
     runs-on: ${{ matrix.os }}
@@ -29,6 +28,17 @@ jobs:
           rust-version: ${{ matrix.rust }}
       - name: Checkout
         uses: actions/checkout@v1
+      - name: Build for Linux
+        if: matrix.os == 'ubuntu-latest'
+        id: build_linux
+        run: |
+          BIN_ZIP=./${BIN_NAME}-${VERSION}-x86_64-linux.zip
+          cargo build --locked --release --target=x86_64-unknown-linux-musl
+          zip -j ${BIN_ZIP} target/x86_64-unknown-linux-musl/release/${BIN_NAME}
+          echo "::set-output name=sha::$(shasum -a 256 ${BIN_ZIP} |awk '{print $1}')"
+        env:
+          BIN_NAME: ${{ steps.set_envs.outputs.bin_name }}
+          VERSION: ${{ steps.set_envs.outputs.version }}
       - name: Build for macOS
         if: matrix.os == 'macOS-latest'
         id: build_mac
