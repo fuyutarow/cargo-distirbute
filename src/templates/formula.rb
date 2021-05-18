@@ -15,7 +15,7 @@ class {{ name_pascal_case }} < Formula
   end
 
   def install
-    bin.install {{ name }}
+    bin.install "{{ name }}"
   end
 
   test do
