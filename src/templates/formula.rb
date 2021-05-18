@@ -1,4 +1,4 @@
-$formula_name = {{ name }}
+$formula_name = "{{ name }}"
 
 class {{ name_pascal_case }} < Formula
   version $version_mac
