@@ -32,7 +32,7 @@ fn main() -> anyhow::Result<()> {
 
             let package = cargo.package.unwrap();
 
-            let name = if let Some(bin_name) = bin {
+            let name = if let Some(bin_name) = bin.clone() {
                 let products = cargo
                     .bin
                     .into_iter()
@@ -88,8 +88,15 @@ fn main() -> anyhow::Result<()> {
 
             {
                 let release = {
+                    let bin_option = if let Some(bin_name) = bin {
+                        format!("--bin {}", &bin_name)
+                    } else {
+                        "".to_string()
+                    };
                     let release_template = include_str!("templates/release.yml");
-                    release_template.replace("{% name %}", &name)
+                    release_template
+                        .replace("{% name %}", &name)
+                        .replace("{% bin_option %}", &bin_option)
                 };
 
                 let release_fpath = {
