@@ -8,21 +8,49 @@ enum Opt {
     #[structopt(name = "build")]
     Build {
         /// ~/homebrew-tap repository path
-        #[structopt(long)]
+        #[structopt(short, long)]
         tap: PathBuf,
+
+        /// Cargo.toml file path
+        #[structopt(short, long, default_value = "Cargo.toml")]
+        file: PathBuf,
+
+        /// Cargo.toml bin
+        #[structopt(short, long)]
+        bin: Option<String>,
     },
 }
 
-fn main() {
+fn main() -> anyhow::Result<()> {
     match Opt::from_args() {
-        Opt::Build { tap } => {
-            let package = {
-                let content = std::fs::read_to_string("Cargo.toml").unwrap();
+        Opt::Build { tap, file, bin } => {
+            let cargo = {
+                let content = std::fs::read_to_string(&file).unwrap();
                 let cargo = toml::from_str::<cargo_toml::Manifest>(&content).unwrap();
-                cargo.package.unwrap()
+                cargo
             };
 
-            let name = package.name;
+            let package = cargo.package.unwrap();
+
+            let name = if let Some(bin_name) = bin {
+                let products = cargo
+                    .bin
+                    .into_iter()
+                    .filter(|product| product.name.as_ref().unwrap().to_string() == bin_name)
+                    .collect::<Vec<_>>();
+                if products.len() > 0 {
+                    bin_name
+                } else {
+                    anyhow::bail!("Not found bin");
+                    // anyhow::bail!(&format!(
+                    //     "Not found bin `{}` in {}",
+                    //     bin_name,
+                    //     file.into_os_string().to_str().unwrap()
+                    // ));
+                }
+            } else {
+                package.name
+            };
             let name_pascal_case = name.to_case(Case::Pascal);
             let descripton = package.description;
             let homepage = package.homepage;
@@ -80,6 +108,8 @@ fn main() {
                         release_fpath.into_os_string().into_string().unwrap()
                     );
                 }
+
+                Ok(())
             }
         }
     }
