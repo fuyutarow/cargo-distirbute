@@ -54,7 +54,8 @@ fn main() -> anyhow::Result<()> {
             let name_pascal_case = name.to_case(Case::Pascal);
             let descripton = package.description;
             let homepage = package.homepage;
-            let repository = package.repository;
+            let repository = package.repository.unwrap_or("".to_string());
+            let repository_url = repository.trim_end_matches(".git");
 
             {
                 let mut context = tera::Context::new();
@@ -63,6 +64,7 @@ fn main() -> anyhow::Result<()> {
                 context.insert("description", &descripton);
                 context.insert("homepage", &homepage);
                 context.insert("repository", &repository);
+                context.insert("repository_url", &repository_url);
 
                 match tera::Tera::one_off(include_str!("templates/formula.rb"), &context, false) {
                     Ok(formula) => {

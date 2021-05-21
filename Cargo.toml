@@ -1,6 +1,6 @@
 [package]
 name = "cargo-distribute"
-version = "0.202105.8"
+version = "0.202105.9"
 authors = ["fuyutarow"]
 edition = "2018"
 description = "A CLI tool"
