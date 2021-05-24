@@ -1,29 +1,31 @@
 use std::path::{Path, PathBuf};
 
-use convert_case::{Case, Casing};
 use structopt::StructOpt;
 
+use cli::Manager;
+
 #[derive(StructOpt, Debug)]
-enum Opt {
-    #[structopt(name = "build")]
-    Build {
-        /// ~/homebrew-tap repository path
-        #[structopt(short, long)]
-        tap: PathBuf,
+struct Opt {
+    /// ~/homebrew-tap repository path
+    #[structopt(short = "t", long = "tap")]
+    homebrew_tap_path: PathBuf,
 
-        /// Cargo.toml file path
-        #[structopt(short, long, default_value = "Cargo.toml")]
-        file: PathBuf,
+    /// Cargo.toml file path
+    #[structopt(short, long, default_value = "Cargo.toml")]
+    file: PathBuf,
 
-        /// Cargo.toml bin
-        #[structopt(short, long)]
-        bin: Option<String>,
-    },
+    /// Cargo.toml bin
+    #[structopt(short, long)]
+    bin: Option<String>,
 }
 
 fn main() -> anyhow::Result<()> {
     match Opt::from_args() {
-        Opt::Build { tap, file, bin } => {
+        Opt {
+            homebrew_tap_path,
+            file,
+            bin,
+        } => {
             let cargo = {
                 let content = std::fs::read_to_string(&file).unwrap();
                 let cargo = toml::from_str::<cargo_toml::Manifest>(&content).unwrap();
@@ -42,84 +44,25 @@ fn main() -> anyhow::Result<()> {
                     bin_name
                 } else {
                     anyhow::bail!("Not found bin");
-                    // anyhow::bail!(&format!(
-                    //     "Not found bin `{}` in {}",
-                    //     bin_name,
-                    //     file.into_os_string().to_str().unwrap()
-                    // ));
                 }
             } else {
                 package.name
             };
-            let name_pascal_case = name.to_case(Case::Pascal);
-            let descripton = package.description;
-            let homepage = package.homepage;
-            let repository = package.repository.unwrap_or("".to_string());
-            let repository_url = repository.trim_end_matches(".git");
 
-            {
-                let mut context = tera::Context::new();
-                context.insert("name", &name);
-                context.insert("name_pascal_case", &name_pascal_case);
-                context.insert("description", &descripton);
-                context.insert("homepage", &homepage);
-                context.insert("repository", &repository);
-                context.insert("repository_url", &repository_url);
+            let manager = Manager {
+                name,
+                description: package.description.unwrap_or("".to_owned()),
+                homepage: package.homepage.unwrap_or("".to_owned()),
+                repository: package.repository.unwrap_or("".to_string()),
+                homebrew_tap_path,
+                bin,
+            };
 
-                match tera::Tera::one_off(include_str!("templates/formula.rb"), &context, false) {
-                    Ok(formula) => {
-                        let tap_templates_dir = {
-                            let path = tap.join("templates");
-                            std::fs::create_dir_all(&path).unwrap();
-                            path
-                        };
+            manager.write_homebrewtap_workflows_update_formula()?;
+            manager.write_homebrewtap_templates_formula()?;
+            manager.write_project_templates_formula()?;
 
-                        let formula_fpath = tap_templates_dir.join(format!("{}.rb", name));
-
-                        {
-                            std::fs::write(&formula_fpath, formula);
-                            println!(
-                                "{} was written",
-                                formula_fpath.into_os_string().into_string().unwrap()
-                            );
-                        }
-                    }
-                    Err(err) => eprintln!("{}", err),
-                }
-            }
-
-            {
-                let release = {
-                    let bin_option = if let Some(bin_name) = bin {
-                        format!("--bin {}", &bin_name)
-                    } else {
-                        "".to_string()
-                    };
-                    let release_template = include_str!("templates/release.yml");
-                    release_template
-                        .replace("{% name %}", &name)
-                        .replace("{% bin_option %}", &bin_option)
-                };
-
-                let release_fpath = {
-                    let github_workflows_dir = {
-                        let path = Path::new(".github/workflows");
-                        std::fs::create_dir_all(&path);
-                        path
-                    };
-                    github_workflows_dir.join("release.yml")
-                };
-
-                {
-                    std::fs::write(&release_fpath, release);
-                    println!(
-                        "{} was written",
-                        release_fpath.into_os_string().into_string().unwrap()
-                    );
-                }
-
-                Ok(())
-            }
+            Ok(())
         }
     }
 }
