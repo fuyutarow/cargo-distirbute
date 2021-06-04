@@ -56,12 +56,8 @@ jobs:
         if: matrix.os == 'windows-latest'
         id: build_windows
         run: |
-          ${BIN_FPATH}="target/x86_64-pc-windows-msvc/release/${BIN_NAME}.exe"
           cargo build --locked --release --target=stable-x86_64-pc-windows-msvc
-          echo "::set-output name=sha::$(Get-FileHash ${BIN_FPATH} | Select-Object Hash)"
-        env:
-          BIN_NAME: ${{ steps.set_envs.outputs.bin_name }}
-          VERSION: ${{ steps.set_envs.outputs.version }}
+          echo "::set-output name=sha::$(Get-FileHash target/x86_64-pc-windows-msvc/release/cargo-distribute.exe | Select-Object Hash)"
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
