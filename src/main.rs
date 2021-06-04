@@ -6,6 +6,7 @@ use structopt::StructOpt;
 use cli::Manager;
 
 #[derive(StructOpt, Debug)]
+#[structopt(bin_name = "cargo")]
 struct Opt {
     /// ~/homebrew-tap repository path
     #[structopt(short = "t", long = "tap")]
@@ -14,6 +15,10 @@ struct Opt {
     /// Cargo.toml file path
     #[structopt(short, long, default_value = "Cargo.toml")]
     file: PathBuf,
+
+    /// Set the channel used to build the rust project
+    #[structopt(long, possible_values=&["stable", "beta", "nightly"], default_value="stable")]
+    channel: String,
 
     /// Cargo.toml bin
     #[structopt(short, long)]
@@ -24,6 +29,7 @@ fn main() -> anyhow::Result<()> {
     let Opt {
         homebrew_tap_path,
         file,
+        channel,
         bin,
     } = Opt::from_args();
 
@@ -86,6 +92,7 @@ fn main() -> anyhow::Result<()> {
 
     if fields_are_filled {
         let manager = Manager {
+            channel,
             name,
             description: package.description.unwrap_or_default(),
             homepage: package.homepage.unwrap_or_default(),

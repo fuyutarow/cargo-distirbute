@@ -8,6 +8,7 @@ use scoop::ScoopJson;
 
 #[derive(Debug, Clone)]
 pub struct Manager {
+    pub channel: String,
     pub name: String,
     pub description: String,
     pub homepage: String,
