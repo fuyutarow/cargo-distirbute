@@ -113,6 +113,7 @@ impl Manager {
             };
             let release_template = include_str!("templates/release.yml");
             release_template
+                .replace("{% channel %}", &self.channel)
                 .replace("{% name %}", &self.name)
                 .replace("{% bin_option %}", &bin_option)
         };

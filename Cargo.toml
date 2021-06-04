@@ -1,6 +1,6 @@
 [package]
 name = "cargo-distribute"
-version = "0.202106.13"
+version = "0.202106.14"
 authors = ["fuyutarow"]
 edition = "2018"
 description = "Template generator for continuous distribution of rust projects to homebrew, linuxbrew and scoop"
