@@ -56,17 +56,16 @@ jobs:
         if: matrix.os == 'windows-latest'
         id: build_windows
         run: |
-          $BIN_ZIP="./${BIN_NAME}-${VERSION}-x86_64-windows.zip"
-          cargo build --locked --release --target=stable-x86_64-pc-windows-gnu
-          powershell Compress-Archive -Path target/x86_64-pc-windows-gnu/release/${BIN_NAME} -DestinationPath ${BIN_ZIP}
-          echo "::set-output name=sha::$(shasum -a 256 ${BIN_ZIP} |awk '{print $1}')"
+          ${BIN_FPATH}="target/x86_64-pc-windows-msvc/release/${BIN_NAME}.exe"
+          cargo build --locked --release --target=stable-x86_64-pc-windows-msvc
+          echo "::set-output name=sha::$(Get-FileHash ${BIN_FPATH} | Select-Object Hash)"
         env:
           BIN_NAME: ${{ steps.set_envs.outputs.bin_name }}
           VERSION: ${{ steps.set_envs.outputs.version }}
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          files: "*.zip\n*.rpm"
+          files: "*.zip\n*.rpm\n*.exe"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Dispatch homebrew Repository update for linux
