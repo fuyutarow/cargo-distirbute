@@ -62,7 +62,10 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          files: "*.zip\n*.rpm\n*.exe"
+          files: |
+            *.zip
+            *.rpm
+            *.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Dispatch homebrew Repository update for linux
