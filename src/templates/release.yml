@@ -58,7 +58,8 @@ jobs:
         run: |
           rustup default stable-x86_64-pc-windows-msvc
           cargo build --locked --release
-          echo "::set-output name=sha::$(Get-FileHash target/release/{% name %}.exe | Select-Object Hash)"
+          mv target/release/{% name %}.exe .
+          echo "::set-output name=sha::$(Get-FileHash {% name %}.exe | Select-Object Hash)"
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
