@@ -47,7 +47,7 @@ jobs:
         run: |
           BIN_ZIP=./${BIN_NAME}-${VERSION}-x86_64-mac.zip
           cargo build --locked --release --target=x86_64-apple-darwin {% bin_option %}
-          powershell Compress-Archive -Path target/x86_64-apple-darwin/release/${BIN_NAME} -DestinationPath temp.zip ${BIN_ZIP}
+          zip -j ${BIN_ZIP} target/x86_64-apple-darwin/release/${BIN_NAME}
           echo "::set-output name=sha::$(shasum -a 256 ${BIN_ZIP} |awk '{print $1}')"
         env:
           BIN_NAME: ${{ steps.set_envs.outputs.bin_name }}
@@ -58,7 +58,7 @@ jobs:
         run: |
           $BIN_ZIP="./${BIN_NAME}-${VERSION}-x86_64-windows.zip"
           cargo build --locked --release --target=stable-x86_64-pc-windows-gnu
-          zip -j ${BIN_ZIP} target/x86_64-pc-windows-gnu/release/${BIN_NAME}
+          powershell Compress-Archive -Path target/x86_64-pc-windows-gnu/release/${BIN_NAME} -DestinationPath ${BIN_ZIP}
           echo "::set-output name=sha::$(shasum -a 256 ${BIN_ZIP} |awk '{print $1}')"
         env:
           BIN_NAME: ${{ steps.set_envs.outputs.bin_name }}
