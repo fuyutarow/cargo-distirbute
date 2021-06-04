@@ -5,7 +5,7 @@ WIP
 
 ## Installation
 ```
-brew install fuyutarow/tap/cargo-distribute
+cargo insatll cargo-distribute
 ```
 
 
@@ -42,7 +42,7 @@ Do a git commit and push in each of the two repositories.  `username/myproject` 
 ```
 ~$ cd ~/myproject
 ~/myproject$ echo ./Cargo.toml
-~/myproject$ cargo-distribute --tap ~/homebrew-tap
+~/myproject$ cargo distribute --tap ~/homebrew-tap
 ~/myproject$ git -A && git commit -m "commit"
 ~/myproject$ git push
 ~$ cd ~/homebrew-tap
