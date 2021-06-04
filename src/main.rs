@@ -55,12 +55,14 @@ fn main() -> anyhow::Result<()> {
         description: package.description.unwrap_or_default(),
         homepage: package.homepage.unwrap_or_default(),
         repository: package.repository.unwrap_or_default(),
+        license: package.license.unwrap_or_default(),
         homebrew_tap_path,
         bin,
     };
 
     manager.write_homebrewtap_workflows_update_formula()?;
     manager.write_homebrewtap_templates_formula()?;
+    manager.write_scoop_bucket()?;
     manager.write_project_templates_formula()?;
 
     Ok(())

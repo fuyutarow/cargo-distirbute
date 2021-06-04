@@ -58,7 +58,7 @@ jobs:
         run: |
           rustup default stable-x86_64-pc-windows-msvc
           cargo build --locked --release
-          7z a {% name %}-x86_64-pc-windows-msvc.zip target/release/{% name %}.exe
+          # 7z a {% name %}-x86_64-pc-windows-msvc.zip target/release/{% name %}.exe
           mv ./target/release/{% name %}.exe .
           echo "::set-output name=sha::$(Get-FileHash {% name %}.exe | Select-Object Hash)"
       - name: Release

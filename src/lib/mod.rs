@@ -1,6 +1,10 @@
 use std::path::{Path, PathBuf};
 
+use colored::*;
 use convert_case::{Case, Casing};
+
+mod scoop;
+use scoop::ScoopJson;
 
 #[derive(Debug, Clone)]
 pub struct Manager {
@@ -8,6 +12,7 @@ pub struct Manager {
     pub description: String,
     pub homepage: String,
     pub repository: String,
+    pub license: String,
     pub homebrew_tap_path: PathBuf,
     pub bin: Option<String>,
 }
@@ -30,11 +35,12 @@ impl Manager {
         );
 
         println!(
-            "{} was written",
+            "✔️ {} was written",
             tap_github_workflows_update_formula_fpath
                 .into_os_string()
                 .into_string()
                 .unwrap()
+                .green()
         );
         Ok(())
     }
@@ -64,15 +70,36 @@ impl Manager {
                 std::fs::write(&tap_templates_formula_fpath, formula_content);
 
                 println!(
-                    "{} was written",
+                    "✔️ {} was written",
                     tap_templates_formula_fpath
                         .into_os_string()
                         .into_string()
                         .unwrap()
+                        .green()
                 );
             }
             Err(err) => eprintln!("{}", err),
         }
+        Ok(())
+    }
+
+    pub fn write_scoop_bucket(&self) -> anyhow::Result<()> {
+        let scoop = ScoopJson::from(self.to_owned());
+        let content = serde_json::to_string_pretty(&scoop)?;
+        let fpath = {
+            let path = self
+                .homebrew_tap_path
+                .join("bucket")
+                .join(format!("{}.json", &self.name));
+            std::fs::create_dir_all(&path.parent().unwrap())?;
+            path
+        };
+        std::fs::write(&fpath, &content)?;
+        println!(
+            "✔️ {} was written",
+            fpath.into_os_string().into_string().unwrap().green()
+        );
+
         Ok(())
     }
 
@@ -102,12 +129,13 @@ impl Manager {
         );
 
         println!(
-            "{} was written",
+            "✔️ {} was written",
             github_workflows_release_fpath
                 .to_owned()
                 .into_os_string()
                 .into_string()
                 .unwrap()
+                .green()
         );
         Ok(())
     }
