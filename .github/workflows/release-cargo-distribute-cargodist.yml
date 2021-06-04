@@ -58,7 +58,8 @@ jobs:
         run: |
           rustup default stable-x86_64-pc-windows-msvc
           cargo build --locked --release
-          mv target/release/cargo-distribute.exe .
+          7z a cargo-distribute-x86_64-pc-windows-msvc.zip target/release/cargo-distribute.exe
+          mv ./target/release/cargo-distribute.exe .
           echo "::set-output name=sha::$(Get-FileHash cargo-distribute.exe | Select-Object Hash)"
       - name: Release
         uses: softprops/action-gh-release@v1
