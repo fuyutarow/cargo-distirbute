@@ -58,8 +58,8 @@ jobs:
         if: matrix.os == 'windows-latest'
         id: build_windows
         run: |
-          rustup default stable
           rustup default stable-x86_64-pc-windows-msvc
+          rustup default stable
           cargo build --locked --release
           # 7z a cargo-distribute-x86_64-pc-windows-msvc.zip target/release/cargo-distribute.exe
           mv ./target/release/cargo-distribute.exe .
