@@ -1,5 +1,6 @@
 use std::path::{Path, PathBuf};
 
+use colored::*;
 use structopt::StructOpt;
 
 use cli::Manager;
@@ -50,20 +51,55 @@ fn main() -> anyhow::Result<()> {
         package.name
     };
 
-    let manager = Manager {
-        name,
-        description: package.description.unwrap_or_default(),
-        homepage: package.homepage.unwrap_or_default(),
-        repository: package.repository.unwrap_or_default(),
-        license: package.license.unwrap_or_default(),
-        homebrew_tap_path,
-        bin,
-    };
+    let mut fields_are_filled = true;
+    if package.description.is_none() {
+        fields_are_filled = false;
+        eprintln!(
+            "❌ The {} field is required in cargo.toml.",
+            "description".red()
+        );
+    }
 
-    manager.write_homebrewtap_workflows_update_formula()?;
-    manager.write_homebrewtap_templates_formula()?;
-    manager.write_scoop_bucket()?;
-    manager.write_project_templates_formula()?;
+    if package.homepage.is_none() {
+        fields_are_filled = false;
+        eprintln!(
+            "❌ The {} field is required in cargo.toml. (e.g. https://github.com/fuyutarow/cargo-distribute)",
+            "homepage".red()
+        );
+    }
+
+    if package.repository.is_none() {
+        fields_are_filled = false;
+        eprintln!(
+            "❌ The {} field is required in cargo.toml. (e.g. https://github.com/fuyutarow/cargo-distribute.git)",
+            "repository".red()
+        );
+    }
+
+    if package.license.is_none() {
+        fields_are_filled = false;
+        eprintln!(
+            "❌ The {} field is required in cargo.toml. (e.g. MIT)",
+            "license".red()
+        );
+    }
+
+    if fields_are_filled {
+        let manager = Manager {
+            name,
+            description: package.description.unwrap_or_default(),
+            homepage: package.homepage.unwrap_or_default(),
+            repository: package.repository.unwrap_or_default(),
+            license: package.license.unwrap_or_default(),
+            homebrew_tap_path,
+            bin,
+        };
+
+        manager.write_homebrewtap_workflows_update_formula()?;
+        manager.write_homebrewtap_templates_formula()?;
+        manager.write_scoop_bucket()?;
+        manager.write_project_templates_formula()?;
+    }
 
     Ok(())
 }
