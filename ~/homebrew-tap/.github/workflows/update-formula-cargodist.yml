@@ -1,0 +1,65 @@
+name: Release
+
+on: repository_dispatch
+
+jobs:
+  update_sha:
+    if: ${{ github.event.client_payload.type == 'update_sha' }}
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@master
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Create local version change
+        run: |
+          REL_FILE=./versions/${BIN_NAME}/${OS}.rb
+          mkdir -p ./versions/${BIN_NAME}
+          echo \$version_${OS} = \"${VERSION}\" > ${REL_FILE}
+          echo \$sha_${OS} = \"${SHA}\" >> ${REL_FILE}
+        env:
+          OS: ${{ github.event.client_payload.os }}
+          BIN_NAME: ${{ github.event.client_payload.bin_name }}
+          VERSION: ${{ github.event.client_payload.version }}
+          SHA: ${{ github.event.client_payload.sha }}
+      - name: Commit version change
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add -A
+          git commit -m "Update sha on ${BIN_NAME}/${OS}"
+          git pull
+        env:
+          OS: ${{ github.event.client_payload.os }}
+          BIN_NAME: ${{ github.event.client_payload.bin_name }}
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+  update_formula:
+    if: ${{ github.event.client_payload.type == 'update_formula' }}
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@master
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Commit version change
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git pull
+          cat ./versions/${BIN_NAME}/* ./templates/${BIN_NAME}.rb > Formula/${BIN_NAME}.rb
+          git add -A
+          git commit -m "Update formula on ${BIN_NAME}"
+        env:
+          BIN_NAME: ${{ github.event.client_payload.bin_name }}
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}

@@ -3,7 +3,7 @@ name = "cargo-distribute"
 version = "0.202105.11"
 authors = ["fuyutarow"]
 edition = "2018"
-description = "A CLI tool"
+description = "Template generator for continuous distribution of rust projects to homebrew, linuxbrew and scoop"
 homepage = "https://github.com/fuyutarow/cargo-distribute"
 repository = "https://github.com/fuyutarow/cargo-distribute.git"
 
