@@ -8,14 +8,15 @@ use scoop::ScoopJson;
 
 #[derive(Debug, Clone)]
 pub struct Manager {
+    pub bin: Option<String>,
     pub channel: String,
+    pub features: Option<String>,
     pub name: String,
     pub description: String,
     pub homepage: String,
     pub repository: String,
     pub license: String,
     pub homebrew_tap_path: PathBuf,
-    pub bin: Option<String>,
 }
 
 impl Manager {
@@ -106,16 +107,22 @@ impl Manager {
 
     pub fn write_project_templates_formula(&self) -> anyhow::Result<()> {
         let github_workflows_release_content = {
-            let bin_option = if let Some(bin_name) = &self.bin {
-                format!("--bin {}", &bin_name)
-            } else {
-                "".to_string()
-            };
+            let bin_option = self
+                .bin
+                .to_owned()
+                .map(|bin_name| format!("--bin {}", &bin_name))
+                .unwrap_or_default();
+            let features_option = self
+                .features
+                .to_owned()
+                .map(|bin_name| format!(r#"--features "{}""#, &bin_name))
+                .unwrap_or_default();
             let release_template = include_str!("templates/release.yml");
             release_template
                 .replace("{% channel %}", &self.channel)
                 .replace("{% name %}", &self.name)
                 .replace("{% bin_option %}", &bin_option)
+                .replace("{% features_option %}", &features_option)
         };
 
         let github_workflows_release_fpath = {

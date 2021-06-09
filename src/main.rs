@@ -16,21 +16,26 @@ struct Opt {
     #[structopt(short, long, default_value = "Cargo.toml")]
     file: PathBuf,
 
+    /// Cargo.toml bin
+    #[structopt(short, long)]
+    bin: Option<String>,
+
     /// Set the channel used to build the rust project
     #[structopt(long, possible_values=&["stable", "beta", "nightly"], default_value="stable")]
     channel: String,
 
-    /// Cargo.toml bin
-    #[structopt(short, long)]
-    bin: Option<String>,
+    /// Set the features used to build the rust project
+    #[structopt(long)]
+    features: Option<String>,
 }
 
 fn main() -> anyhow::Result<()> {
     let Opt {
         homebrew_tap_path,
         file,
-        channel,
         bin,
+        channel,
+        features,
     } = Opt::from_args();
 
     let cargo = {
@@ -92,14 +97,15 @@ fn main() -> anyhow::Result<()> {
 
     if fields_are_filled {
         let manager = Manager {
+            bin,
             channel,
+            features,
             name,
             description: package.description.unwrap_or_default(),
             homepage: package.homepage.unwrap_or_default(),
             repository: package.repository.unwrap_or_default(),
             license: package.license.unwrap_or_default(),
             homebrew_tap_path,
-            bin,
         };
 
         manager.write_homebrewtap_workflows_update_formula()?;
